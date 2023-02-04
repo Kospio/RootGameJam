@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Suelo
+  - Dash
+  - Movement
+  - Lateral
   layers:
   - Default
   - TransparentFX

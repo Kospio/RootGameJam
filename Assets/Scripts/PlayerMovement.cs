@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 using UnityEngine.Tilemaps;
 
 public class PlayerMovement : MonoBehaviour
@@ -15,9 +14,15 @@ public class PlayerMovement : MonoBehaviour
     private Vector3Int playerTilePosition;
     private Vector3Int playerTileDestination;
 
+    public CardMovement cardMovement;
+
+    List<GameObject> interactableTiles; 
+
     // Start is called before the first frame update
     void Start()
     {
+        cardMovement = GetComponent<CardMovement>();
+
         playerTilePosition = groundTilemap.WorldToCell(transform.position);
 
         SetPlayerPosition();
@@ -35,12 +40,10 @@ public class PlayerMovement : MonoBehaviour
 
             Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
 
-            
-
             if (sphereColliders.Length != 0)
             {
                 RaycastHit hit;
-                if (!Physics.Raycast(transform.position + raycastCorrectionVector, new Vector3(directionAndSize.x,directionAndSize.z,directionAndSize.y), out hit, directionAndSize.y))
+                if (!Physics.Raycast(transform.position + raycastCorrectionVector, new Vector3(directionAndSize.x, directionAndSize.z, directionAndSize.y), out hit, directionAndSize.y))
                 {
 
                     playerTilePosition = playerTileDestination;
@@ -96,17 +99,20 @@ public class PlayerMovement : MonoBehaviour
         transform.position = groundTilemap.GetCellCenterWorld(playerTilePosition);
     }
 
-    void DashAttack()
+    public void DashAttack()
     {
 
     }
 
-    void MoveCard()
+    public void MoveCard()
     {
+
+
+        Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
 
     }
 
-    void LateralAttack()
+    public void LateralAttack()
     {
 
     }

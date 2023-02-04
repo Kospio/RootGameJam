@@ -9,20 +9,24 @@ using UnityEngine.InputSystem.HID;
 public class CardMovement : MonoBehaviour
 {
     Camera mainCamera;
-    public GameObject SpehereTest;
     public LayerMask cardLayer;
     public LayerMask terrainMask;
 
     public int controlMovingCard;
 
-    public GameObject card1, card2, card3, deck, child;
+    public GameObject card1, card2, card3, deck;
+    GameObject child; 
 
     bool positionStablished;
 
     Vector3 tempOriginalPosition; 
+
+    public PlayerMovement playermovement; 
     // Start is called before the first frame update
     void Start()
     {
+        playermovement = GetComponent<PlayerMovement>(); 
+
         mainCamera = GetComponent<Camera>();
 
         ActiveDeactiveLineRenderer(false, card1.transform.GetChild(0).gameObject);
@@ -47,6 +51,18 @@ public class CardMovement : MonoBehaviour
             //Luego el terreno por el que se puede mover. Se empieza a mover la carta
             if (Physics.Raycast(ray, out RaycastHit terrainHit, float.MaxValue, terrainMask))
             {
+                if (terrainHit.transform.gameObject.CompareTag("Dash"))
+                {
+                    playermovement.DashAttack(); 
+                }
+                else if (terrainHit.transform.gameObject.CompareTag("Movement"))
+                {
+                    playermovement.MoveCard();
+                }
+                else if (terrainHit.transform.gameObject.CompareTag("Lateral"))
+                {
+                    playermovement.LateralAttack();
+                }
 
                 raycastCardHit.transform.position = terrainHit.point;
                 child = raycastCardHit.transform.GetChild(0).gameObject; 
@@ -54,21 +70,21 @@ public class CardMovement : MonoBehaviour
                 child.transform.position = new Vector3(raycastCardHit.transform.position.x, controlMovingCard, raycastCardHit.transform.position.z);
 
                 ActiveDeactiveLineRenderer(true, child);
-                ChangeMaterialAlpha(0.2f); 
+                ChangeMaterialAlpha(0.4f); 
             }
         }
 
         //Cuando se suelta la carta y vuelve
         if (Input.GetButtonUp("Fire1"))
         {
-            Debug.Log("Debería volver");
-
             raycastCardHit.transform.position = tempOriginalPosition;
             child.transform.position = raycastCardHit.transform.position;
 
             ActiveDeactiveLineRenderer(false, child);
 
             positionStablished = false;
+
+            ChangeMaterialAlpha(1); 
         }
     }
 
