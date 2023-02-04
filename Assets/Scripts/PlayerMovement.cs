@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     Vector3 raycastCorrectionVector = new Vector3(0, 0.5f, 0);
     //Tile Position of the player. It is used to use adyacent tiles in future functions
-    [SerializeField] private Vector3Int playerTilePosition;
+    public Vector3Int playerTilePosition;
     private Vector3Int playerTileDestination;
 
     public Material tileActuationMaterial;
@@ -23,6 +23,8 @@ public class PlayerMovement : MonoBehaviour
 
     public List<GameObject> interactableTiles;
 
+    public GameObject playerMesh; 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,81 +33,60 @@ public class PlayerMovement : MonoBehaviour
         playerTilePosition = groundTilemap.WorldToCell(transform.position);
 
         playerTileDestination = playerTilePosition;
-        SetPlayerPosition();
+        StartCoroutine(SetPlayerPosition(0.01f));
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //if (Input.GetKeyDown("w"))
-        //{
-        //    Vector3Int directionAndSize;
-        //    directionAndSize = new Vector3Int(0, +1, 0);
-
-        //    playerTileDestination = playerTilePosition + directionAndSize;
-
-        //    Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
-
-        //    if (sphereColliders[0].gameObject.CompareTag("Suelo"))
-        //    {
-        //        RaycastHit hit;
-        //        if (!Physics.Raycast(transform.position + raycastCorrectionVector, new Vector3(directionAndSize.x, directionAndSize.z, directionAndSize.y), out hit, directionAndSize.y))
-        //        {
-        //            playerTilePosition = playerTileDestination;
-        //            SetPlayerPosition();
-        //        }
-
-        //    }
-        //}
-        //if (Input.GetKeyDown("s"))
-        //{
-        //    playerTileDestination = playerTilePosition + new Vector3Int(0, -1, 0);
-
-        //    Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
-
-        //    if (sphereColliders[0].gameObject.CompareTag("Suelo"))
-        //    {
-        //        playerTilePosition = playerTileDestination;
-        //        SetPlayerPosition();
-        //    }
-
-        //}
-        //if (Input.GetKeyDown("d"))
-        //{
-        //    playerTileDestination = playerTilePosition + new Vector3Int(+1, 0, 0);
-
-        //    Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
-
-        //    if (sphereColliders[0].gameObject.CompareTag("Suelo"))
-        //    {
-        //        playerTilePosition = playerTileDestination;
-        //        SetPlayerPosition();
-        //    }
-
-        //}
-        //if (Input.GetKeyDown("a"))
-        //{
-        //    playerTileDestination = playerTilePosition + new Vector3Int(-1, 0, 0);
-        //    Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
-
-        //    if (sphereColliders[0].gameObject.CompareTag("Suelo"))
-        //    {
-        //        playerTilePosition = playerTileDestination;
-        //        SetPlayerPosition();
-        //    }
-        //}
-    }
-
-    public void SetPlayerPosition()
+    IEnumerator SetPlayerPosition(float duration)
     //Sets the playerTilePosition to the Tile it is in
     {
+        //Arriba
+        if (playerTilePosition.y < playerTileDestination.y)
+        {
+            Debug.Log("Arriba");
+            transform.localEulerAngles = new Vector3(0, 0, 0);
+        }
+        //Abajo
+        else if (playerTilePosition.y > playerTileDestination.y)
+        {
+            Debug.Log("Abajo");
+            transform.localEulerAngles = new Vector3(0, 180, 0);
+        }
+        //Derecha
+        else if (playerTilePosition.x < playerTileDestination.x)
+        {
+            Debug.Log("Derecha");
+            transform.localEulerAngles = new Vector3(0, 90, 0);
+        }
+        //Izquierda
+        else if (playerTilePosition.x > playerTileDestination.x)
+        {
+            Debug.Log("Izquierda");
+            transform.localEulerAngles = new Vector3(0, 270, 0);
+        }
+
         playerTilePosition = playerTileDestination;
+
+        float time = 0;
+
+        while (time < duration)
+        {
+            transform.position = Vector3.Lerp(transform.position, groundTilemap.GetCellCenterWorld(playerTilePosition), time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
         transform.position = groundTilemap.GetCellCenterWorld(playerTilePosition);
     }
 
     public void DashAttack()
     {
-
+        for (int i = 0; i < interactableTiles.Count; i++)
+        {
+            if (groundTilemap.WorldToCell(interactableTiles[i].transform.position) == groundTilemap.WorldToCell(cardMovement.groundhittingPoint))
+            {
+                playerTileDestination = groundTilemap.WorldToCell(interactableTiles[i].transform.position);
+                StartCoroutine(SetPlayerPosition(0.4f));
+            }
+        }
     }
 
     public void MoveCard()
@@ -114,11 +95,8 @@ public class PlayerMovement : MonoBehaviour
         {
             if (groundTilemap.WorldToCell(interactableTiles[i].transform.position) == groundTilemap.WorldToCell(cardMovement.groundhittingPoint))
             {
-                if (interactableTiles[i].gameObject.CompareTag("Suelo"))
-                {
-                    playerTileDestination = groundTilemap.WorldToCell(interactableTiles[i].transform.position);
-                    SetPlayerPosition();
-                }
+                playerTileDestination = groundTilemap.WorldToCell(interactableTiles[i].transform.position);
+                StartCoroutine(SetPlayerPosition(0.2f));
             }
         }
     }
@@ -137,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
 
             Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
 
-            if (sphereColliders.Length == 1)
+            if (sphereColliders.Length == 1 && sphereColliders[0].gameObject.CompareTag("Suelo"))
             {
                 interactableTiles.Add(sphereColliders[0].gameObject);
             }
@@ -154,7 +132,7 @@ public class PlayerMovement : MonoBehaviour
 
             Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
 
-            if (sphereColliders.Length == 1)
+            if (sphereColliders.Length == 1 && sphereColliders[0].gameObject.CompareTag("Suelo"))
             {
                 interactableTiles.Add(sphereColliders[0].gameObject);
             }
@@ -171,7 +149,7 @@ public class PlayerMovement : MonoBehaviour
 
             Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
 
-            if (sphereColliders.Length == 1)
+            if (sphereColliders.Length == 1 && sphereColliders[0].gameObject.CompareTag("Suelo"))
             {
                 interactableTiles.Add(sphereColliders[0].gameObject);
             }
@@ -188,7 +166,7 @@ public class PlayerMovement : MonoBehaviour
 
             Collider[] sphereColliders = Physics.OverlapSphere(groundTilemap.GetCellCenterWorld(playerTileDestination), 0.1f);
 
-            if (sphereColliders.Length == 1)
+            if (sphereColliders.Length == 1 && sphereColliders[0].gameObject.CompareTag("Suelo"))
             {
                 interactableTiles.Add(sphereColliders[0].gameObject);
             }

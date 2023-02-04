@@ -8,6 +8,7 @@ TagManager:
   - Dash
   - Movement
   - Lateral
+  - Enemie
   layers:
   - Default
   - TransparentFX

@@ -56,7 +56,7 @@ public class CardMovement : MonoBehaviour
 
                 if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Dash"))
                 {
-                    playermovement.DashAttack();
+                    playermovement.CheckIfTiles(3);
                 }
                 if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Movement"))
                 {
@@ -64,7 +64,9 @@ public class CardMovement : MonoBehaviour
                 }
                 if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Lateral"))
                 {
-                    playermovement.LateralAttack();
+                    Collider[] sphereColliders = Physics.OverlapSphere(playermovement.groundTilemap.GetCellCenterWorld(playermovement.playerTilePosition), 0.1f);
+
+                    sphereColliders[0].GetComponent<MeshRenderer>().material = playermovement.tileActuationMaterial; 
                 }
 
                 child = raycastCardHit.transform.GetChild(0).gameObject;
