@@ -15,17 +15,21 @@ public class CardMovement : MonoBehaviour
     public int controlMovingCard;
 
     public GameObject card1, card2, card3, deck;
-    GameObject child; 
+    GameObject child;
+    public GameObject cardSelected; 
 
     bool positionStablished;
 
-    Vector3 tempOriginalPosition; 
+    [SerializeField] Vector3 tempOriginalPosition;
+    public Vector3 groundhittingPoint; 
 
-    public PlayerMovement playermovement; 
+    public PlayerMovement playermovement;
+
+    [HideInInspector] public Vector3 selectedCardPosition; 
     // Start is called before the first frame update
     void Start()
     {
-        playermovement = GetComponent<PlayerMovement>(); 
+        playermovement = playermovement.GetComponent<PlayerMovement>();
 
         mainCamera = GetComponent<Camera>();
 
@@ -38,53 +42,83 @@ public class CardMovement : MonoBehaviour
     void Update()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
         //Primero checa si se coge la carta
-        if (Physics.Raycast(ray, out RaycastHit raycastCardHit, float.MaxValue, cardLayer) && Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0) && !positionStablished)
         {
-            if (!positionStablished)
+            if (Physics.Raycast(ray, out RaycastHit raycastCardHit, float.MaxValue, cardLayer))
             {
+                cardSelected = raycastCardHit.transform.gameObject; 
+
                 tempOriginalPosition = raycastCardHit.transform.position;
 
-                positionStablished = true; 
-            }
+                positionStablished = true;
 
-            //Luego el terreno por el que se puede mover. Se empieza a mover la carta
-            if (Physics.Raycast(ray, out RaycastHit terrainHit, float.MaxValue, terrainMask))
-            {
-                if (terrainHit.transform.gameObject.CompareTag("Dash"))
+                if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Dash"))
                 {
-                    playermovement.DashAttack(); 
+                    playermovement.DashAttack();
                 }
-                else if (terrainHit.transform.gameObject.CompareTag("Movement"))
+                if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Movement"))
                 {
-                    playermovement.MoveCard();
+                    playermovement.CheckIfTiles(1);
                 }
-                else if (terrainHit.transform.gameObject.CompareTag("Lateral"))
+                if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Lateral"))
                 {
                     playermovement.LateralAttack();
                 }
 
-                raycastCardHit.transform.position = terrainHit.point;
-                child = raycastCardHit.transform.GetChild(0).gameObject; 
+                child = raycastCardHit.transform.GetChild(0).gameObject;
 
                 child.transform.position = new Vector3(raycastCardHit.transform.position.x, controlMovingCard, raycastCardHit.transform.position.z);
 
                 ActiveDeactiveLineRenderer(true, child);
-                ChangeMaterialAlpha(0.4f); 
+                ChangeMaterialAlpha(0.4f);
             }
+            
+        }
+
+        //Se tiene que hacer mientras se mantenga pulsado para poder moverse bien
+        if (Physics.Raycast(ray, out RaycastHit terrainHit, float.MaxValue, terrainMask) && Input.GetMouseButton(0))
+        {
+            cardSelected.transform.position = terrainHit.point;
+
+            groundhittingPoint = terrainHit.point;
         }
 
         //Cuando se suelta la carta y vuelve
         if (Input.GetButtonUp("Fire1"))
         {
-            raycastCardHit.transform.position = tempOriginalPosition;
-            child.transform.position = raycastCardHit.transform.position;
+            if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Dash"))
+            {
+                playermovement.DashAttack();
+            }
+
+            if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Movement"))
+            {
+                playermovement.MoveCard();
+            }
+
+            if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Lateral"))
+            {
+                playermovement.LateralAttack();
+            }
+
+            cardSelected.transform.position = tempOriginalPosition;
+            child.transform.position = cardSelected.transform.position;
 
             ActiveDeactiveLineRenderer(false, child);
 
             positionStablished = false;
 
-            ChangeMaterialAlpha(1); 
+            ChangeMaterialAlpha(1);
+
+            //Limpiar la lista para otra función
+
+            foreach (GameObject go in playermovement.interactableTiles)
+            {
+                go.GetComponent<MeshRenderer>().material = playermovement.tileActualMaterial;
+            }
+            playermovement.interactableTiles.Clear();
         }
     }
 
@@ -95,8 +129,8 @@ public class CardMovement : MonoBehaviour
 
     void ChangeMaterialAlpha(float alphaColor)
     {
-        Color previousColor = child.GetComponent<MeshRenderer>().material.color; 
+        Color previousColor = child.GetComponent<MeshRenderer>().material.color;
 
-        child.GetComponent<MeshRenderer>().material.color = new Color(previousColor.r, previousColor.g, previousColor.b, alphaColor); 
+        child.GetComponent<MeshRenderer>().material.color = new Color(previousColor.r, previousColor.g, previousColor.b, alphaColor);
     }
 }
