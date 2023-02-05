@@ -27,9 +27,13 @@ public class PlayerMovement : MonoBehaviour
 
     public LevelManager levelManager;
 
+    public bool canKill; 
+
     // Start is called before the first frame update
     void Start()
     {
+        canKill = false; 
+
         levelManager = levelManager.GetComponent<LevelManager>();
         cardMovement = cardMovement.GetComponent<CardMovement>();
 
@@ -45,25 +49,21 @@ public class PlayerMovement : MonoBehaviour
         //Arriba
         if (playerTilePosition.y < playerTileDestination.y)
         {
-            Debug.Log("Arriba");
             transform.localEulerAngles = new Vector3(0, 0, 0);
         }
         //Abajo
         else if (playerTilePosition.y > playerTileDestination.y)
         {
-            Debug.Log("Abajo");
             transform.localEulerAngles = new Vector3(0, 180, 0);
         }
         //Derecha
         else if (playerTilePosition.x < playerTileDestination.x)
         {
-            Debug.Log("Derecha");
             transform.localEulerAngles = new Vector3(0, 90, 0);
         }
         //Izquierda
         else if (playerTilePosition.x > playerTileDestination.x)
         {
-            Debug.Log("Izquierda");
             transform.localEulerAngles = new Vector3(0, 270, 0);
         }
 
@@ -78,10 +78,14 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
         transform.position = groundTilemap.GetCellCenterWorld(playerTilePosition);
+
+        canKill = false; 
     }
 
     public void DashAttack()
     {
+        canKill = true; 
+
         for (int i = 0; i < interactableTiles.Count; i++)
         {
             if (groundTilemap.WorldToCell(interactableTiles[i].transform.position) == groundTilemap.WorldToCell(cardMovement.groundhittingPoint))
@@ -123,17 +127,29 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator SpawnBox (float time)
     {
         gameObject.GetComponent<BoxCollider>().enabled = true;
+        canKill = true; 
 
         yield return new WaitForSeconds(time);
 
         gameObject.GetComponent<BoxCollider>().enabled = false;
+        canKill = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Enemie"))
+        if (other.gameObject.CompareTag("Enemie") && canKill == true)
         {
             levelManager.KillEnemy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Enemie") && canKill == false)
+        {
+            levelManager.GameOver();
+        }
+
+        if (other.gameObject.CompareTag("FinalBunny") && levelManager.canWin)
+        {
+            levelManager.Winning(); 
         }
     }
 

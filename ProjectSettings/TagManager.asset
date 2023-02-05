@@ -9,6 +9,7 @@ TagManager:
   - Movement
   - Lateral
   - Enemie
+  - FinalBunny
   layers:
   - Default
   - TransparentFX

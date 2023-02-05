@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour
     GameObject[] Enemies;
 
     int deckRemain, enemiesRemain, turnNumber, deckInitial;
+    public int maxTurn; 
 
     public int[] cardNumberArray;
 
@@ -21,6 +22,13 @@ public class LevelManager : MonoBehaviour
     public int dashInitial, moveInitial, lateralInitia;
 
     public Text deckText;
+    public Text actualRoundText;
+    public Text maxRoundsText;
+
+    public bool canWin;
+    public bool canNextTurn; 
+
+    public GameObject winBunny; 
     // Start is called before the first frame update
     void Start()
     {
@@ -41,11 +49,14 @@ public class LevelManager : MonoBehaviour
         cardPositionArray[2] = CardPosition3;
 
 
+
         Enemies = GameObject.FindGameObjectsWithTag("Enemie");
         enemiesRemain = Enemies.Length;
 
         SpawnRandomCards();
-        UpdateGUI(); 
+        UpdateGUI();
+
+        StartCoroutine(TurnSafetyTime(0.5f));
     }
 
     public void KillEnemy(GameObject enemyGO)
@@ -60,22 +71,43 @@ public class LevelManager : MonoBehaviour
     }
     public void KilledThemAll()
     {
+        canWin = true;
 
+        winBunny.GetComponent<MeshRenderer>().material.color = new Color(255, 255, 255, 1); 
     }
     public void NextTurn()
     {
-        GameObject[] enemiesGO = GameObject.FindGameObjectsWithTag("Enemie");
-
-        for (int i = 0; i < enemiesGO.Length; i++)
+        if (canNextTurn)
         {
-            enemiesGO[i].GetComponent<EnemyMovement>().preEnemyMovement();
+            StartCoroutine(TurnSafetyTime(0.5f)); 
+
+            GameObject[] enemiesGO = GameObject.FindGameObjectsWithTag("Enemie");
+
+            for (int i = 0; i < enemiesGO.Length; i++)
+            {
+                enemiesGO[i].GetComponent<EnemyMovement>().preEnemyMovement();
+            }
+
+            CheckForCards();
+            SpawnRandomCards();
+            UpdateGUI();
+
+            turnNumber++;
+
+            if (turnNumber == maxTurn)
+            {
+                GameOver();
+            }
         }
+    }
 
-        CheckForCards(); 
-        SpawnRandomCards();
-        UpdateGUI();
+    public IEnumerator TurnSafetyTime(float time)
+    {
+        canNextTurn = false;
 
-        turnNumber++;
+        yield return new WaitForSeconds(time);
+
+        canNextTurn = true; 
     }
     void CheckForCards()
     {
@@ -126,7 +158,20 @@ public class LevelManager : MonoBehaviour
 
     void UpdateGUI()
     {
+        actualRoundText.text = turnNumber.ToString();
+        maxRoundsText.text = maxTurn.ToString(); 
+
         deckRemain = cardNumberArray[0] + cardNumberArray[1] + cardNumberArray[2];
         deckText.text = deckRemain.ToString();
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("GameOver"); 
+    }
+
+    public void Winning()
+    {
+        Debug.Log("Win");
     }
 }
