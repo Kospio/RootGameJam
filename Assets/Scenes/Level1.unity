@@ -16312,7 +16312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73ec7bc5a03fd5b4cb9bc42d1c58b968, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxTurn: 50
+  maxTurn: 75
   cardNumberArray: 
   movePrefab: {fileID: 2951454837682425926, guid: 205631ccaa3e130408da9aac9bc2325d, type: 3}
   dashPrefab: {fileID: 988553899852662601, guid: 49e6fc9748ee24246a0409dba32344da, type: 3}
