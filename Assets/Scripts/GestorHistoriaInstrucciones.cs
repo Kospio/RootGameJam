@@ -21,10 +21,13 @@ public class GestorHistoriaInstrucciones : MonoBehaviour
 
     public Canvas instrucciones;
 
-    public bool canbutton; 
+    public bool canbutton;
+
+    public AudioSource audioSource; 
 
     private void Start()
     {
+        audioSource = audioSource.gameObject.GetComponent<AudioSource>(); 
         instrucciones.gameObject.SetActive(false);
 
         pantallaImagen = pantallaImagenGO.GetComponent<Image>(); 
@@ -32,6 +35,7 @@ public class GestorHistoriaInstrucciones : MonoBehaviour
 
     public void preCambioHistoria()
     {
+        audioSource.Play(); 
         StartCoroutine(CambiosHistoria());
         canbutton = false; 
     }

@@ -29,11 +29,14 @@ public class PlayerMovement : MonoBehaviour
 
     public bool canKill;
 
-    public Animator potatoAnimato; 
+    public Animator potatoAnimato;
+    public Animator latAnim; 
 
     // Start is called before the first frame update
     void Start()
     {
+        latAnim = latAnim.gameObject.GetComponent<Animator>(); 
+
         canKill = false; 
 
         levelManager = levelManager.GetComponent<LevelManager>();
@@ -128,6 +131,8 @@ public class PlayerMovement : MonoBehaviour
         StartCoroutine(SpawnBox(0.2f));
 
         Destroy(cardMovement.cardSelected.transform.GetChild(0).gameObject);
+
+        latAnim.SetTrigger("Attack"); 
 
     }
 

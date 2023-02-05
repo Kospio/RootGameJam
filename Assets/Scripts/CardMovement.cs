@@ -24,12 +24,19 @@ public class CardMovement : MonoBehaviour
     public Vector3 groundhittingPoint;
 
     public PlayerMovement playermovement;
+    public LevelManager levelManager;
+
+    public AudioSource playerGO; 
+    public AudioClip[] SFXScene; 
 
     [HideInInspector] public Vector3 selectedCardPosition;
     // Start is called before the first frame update
     void Start()
     {
+        playerGO = playerGO.gameObject.GetComponentInChildren<AudioSource>(); 
+
         playermovement = playermovement.GetComponent<PlayerMovement>();
+        levelManager = levelManager.GetComponent<LevelManager>();
 
         mainCamera = GetComponent<Camera>();
 
@@ -102,16 +109,28 @@ public class CardMovement : MonoBehaviour
                     if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Dash"))
                     {
                         playermovement.DashAttack();
+                        levelManager.NextTurn();
+
+                        playerGO.clip = SFXScene[0]; 
+                        playerGO.Play(); 
                     }
 
                     if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Movement"))
                     {
                         playermovement.MoveCard();
+                        levelManager.NextTurn();
+
+                        playerGO.clip = SFXScene[2];
+                        playerGO.Play();
                     }
 
                     if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Lateral"))
                     {
                         playermovement.LateralAttack();
+                        levelManager.NextTurn();
+
+                        playerGO.clip = SFXScene[1];
+                        playerGO.Play();
                     }
                 }
             }

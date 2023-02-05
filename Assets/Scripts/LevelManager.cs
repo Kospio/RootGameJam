@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement; 
 
 public class LevelManager : MonoBehaviour
 {
@@ -27,12 +28,20 @@ public class LevelManager : MonoBehaviour
     public Text maxRoundsText;
 
     public bool canWin;
-    public bool canNextTurn; 
+    public bool canNextTurn;
+
+    public AudioSource playerGO;
+    public AudioClip[] SFXScene;
 
     public GameObject winBunny;
+
+    public CardMovement cardMovement; 
     // Start is called before the first frame update
     void Start()
     {
+        playerGO = playerGO.gameObject.GetComponentInChildren<AudioSource>();
+        cardMovement = cardMovement.GetComponent<CardMovement>(); 
+
         cardNumberArray = new int[3];
         cardPool = new GameObject[3];
         cardPositionArray = new GameObject[3];
@@ -81,6 +90,34 @@ public class LevelManager : MonoBehaviour
         if (canNextTurn)
         {
             StartCoroutine(TurnSafetyTime(0.5f)); 
+
+            GameObject[] enemiesGO = GameObject.FindGameObjectsWithTag("Enemie");
+
+            for (int i = 0; i < enemiesGO.Length; i++)
+            {
+                enemiesGO[i].GetComponent<EnemyMovement>().preEnemyMovement();
+            }
+
+            
+            UpdateGUI();
+
+            turnNumber++;
+
+            if (turnNumber == maxTurn)
+            {
+                GameOver();
+            }
+        }
+    }
+
+    public void NextTurnButton()
+    {
+        if (canNextTurn)
+        {
+            playerGO.clip = cardMovement.SFXScene[3];
+            playerGO.Play();
+
+            StartCoroutine(TurnSafetyTime(0.5f));
 
             GameObject[] enemiesGO = GameObject.FindGameObjectsWithTag("Enemie");
 
@@ -168,7 +205,7 @@ public class LevelManager : MonoBehaviour
 
     public void GameOver()
     {
-        Debug.Log("GameOver"); 
+        SceneManager.LoadScene(""); 
     }
 
     public void Winning()
