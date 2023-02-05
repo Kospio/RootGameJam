@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -28,7 +29,7 @@ public class LevelManager : MonoBehaviour
     public bool canWin;
     public bool canNextTurn; 
 
-    public GameObject winBunny; 
+    public GameObject winBunny;
     // Start is called before the first frame update
     void Start()
     {
@@ -48,7 +49,7 @@ public class LevelManager : MonoBehaviour
         cardPositionArray[1] = CardPosition2;
         cardPositionArray[2] = CardPosition3;
 
-
+        turnNumber++; 
 
         Enemies = GameObject.FindGameObjectsWithTag("Enemie");
         enemiesRemain = Enemies.Length;
@@ -73,7 +74,7 @@ public class LevelManager : MonoBehaviour
     {
         canWin = true;
 
-        winBunny.GetComponent<MeshRenderer>().material.color = new Color(255, 255, 255, 1); 
+        winBunny.GetComponent<MeshRenderer>().material.color = new Color(1, 1, 1); 
     }
     public void NextTurn()
     {
