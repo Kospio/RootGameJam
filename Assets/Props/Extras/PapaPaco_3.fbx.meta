@@ -62,6 +62,11 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Patata
+    second: {fileID: 2100000, guid: edc6a36e285291e41b4d1ebf713cac8b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: hoja
     second: {fileID: 2100000, guid: 59f7c2202d8f4c64993f0b03a0d65904, type: 2}
   materials:
     materialImportMode: 2
@@ -239,8 +244,8 @@ ModelImporter:
       name: salto.001
       takeName: salto.001
       internalID: 0
-      firstFrame: 0
-      lastFrame: 103
+      firstFrame: 35
+      lastFrame: 77
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -326,8 +331,8 @@ ModelImporter:
       name: "Pacotata|Doble golpe increiblemente \xE9pico"
       takeName: "Pacotata|Doble golpe increiblemente \xE9pico"
       internalID: 0
-      firstFrame: 0
-      lastFrame: 71
+      firstFrame: 15
+      lastFrame: 65
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
