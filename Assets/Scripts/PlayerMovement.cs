@@ -27,7 +27,9 @@ public class PlayerMovement : MonoBehaviour
 
     public LevelManager levelManager;
 
-    public bool canKill; 
+    public bool canKill;
+
+    public Animator potatoAnimato; 
 
     // Start is called before the first frame update
     void Start()
@@ -84,7 +86,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void DashAttack()
     {
-        canKill = true; 
+        canKill = true;
+
+        potatoAnimato.SetTrigger("corte");
 
         for (int i = 0; i < interactableTiles.Count; i++)
         {
@@ -102,6 +106,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void MoveCard()
     {
+        potatoAnimato.SetTrigger("saltar");
+
         for (int i = 0; i < interactableTiles.Count; i++)
         {
             if (groundTilemap.WorldToCell(interactableTiles[i].transform.position) == groundTilemap.WorldToCell(cardMovement.groundhittingPoint))
@@ -117,18 +123,19 @@ public class PlayerMovement : MonoBehaviour
 
     public void LateralAttack()
     {
-        StartCoroutine(SpawnBox(0.2f)); 
+        potatoAnimato.SetTrigger("corte_especial");
+
+        StartCoroutine(SpawnBox(0.2f));
 
         Destroy(cardMovement.cardSelected.transform.GetChild(0).gameObject);
 
-        StartCoroutine(SetPlayerPosition(0f));
     }
 
     IEnumerator SpawnBox (float time)
     {
+        canKill = true;
         gameObject.GetComponent<BoxCollider>().enabled = true;
-        canKill = true; 
-
+        
         yield return new WaitForSeconds(time);
 
         gameObject.GetComponent<BoxCollider>().enabled = false;
