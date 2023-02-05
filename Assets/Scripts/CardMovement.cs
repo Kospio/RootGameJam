@@ -16,16 +16,16 @@ public class CardMovement : MonoBehaviour
 
     public GameObject card1, card2, card3, deck;
     GameObject child;
-    public GameObject cardSelected; 
+    public GameObject cardSelected;
 
     bool positionStablished;
 
     [SerializeField] Vector3 tempOriginalPosition;
-    public Vector3 groundhittingPoint; 
+    public Vector3 groundhittingPoint;
 
     public PlayerMovement playermovement;
 
-    [HideInInspector] public Vector3 selectedCardPosition; 
+    [HideInInspector] public Vector3 selectedCardPosition;
     // Start is called before the first frame update
     void Start()
     {
@@ -48,7 +48,7 @@ public class CardMovement : MonoBehaviour
         {
             if (Physics.Raycast(ray, out RaycastHit raycastCardHit, float.MaxValue, cardLayer))
             {
-                cardSelected = raycastCardHit.transform.gameObject; 
+                cardSelected = raycastCardHit.transform.gameObject;
 
                 tempOriginalPosition = raycastCardHit.transform.position;
 
@@ -66,7 +66,9 @@ public class CardMovement : MonoBehaviour
                 {
                     Collider[] sphereColliders = Physics.OverlapSphere(playermovement.groundTilemap.GetCellCenterWorld(playermovement.playerTilePosition), 0.1f);
 
-                    sphereColliders[0].GetComponent<MeshRenderer>().material = playermovement.tileActuationMaterial; 
+                    playermovement.interactableTiles.Add(sphereColliders[0].gameObject);
+
+                    sphereColliders[0].GetComponent<MeshRenderer>().material = playermovement.tileActuationMaterial;
                 }
 
                 child = raycastCardHit.transform.GetChild(0).gameObject;
@@ -76,7 +78,7 @@ public class CardMovement : MonoBehaviour
                 ActiveDeactiveLineRenderer(true, child);
                 ChangeMaterialAlpha(0.4f);
             }
-            
+
         }
 
         //Se tiene que hacer mientras se mantenga pulsado para poder moverse bien
@@ -90,25 +92,34 @@ public class CardMovement : MonoBehaviour
         //Cuando se suelta la carta y vuelve
         if (Input.GetButtonUp("Fire1"))
         {
-            if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Dash"))
+            for (int i = 0; i < playermovement.interactableTiles.Count; i++)
             {
-                playermovement.DashAttack();
-            }
+                if (playermovement.groundTilemap.WorldToCell(playermovement.interactableTiles[i].transform.position) == playermovement.groundTilemap.WorldToCell(playermovement.cardMovement.groundhittingPoint))
+                {
+                    if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Dash"))
+                    {
+                        playermovement.DashAttack();
+                    }
 
-            if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Movement"))
-            {
-                playermovement.MoveCard();
-            }
+                    if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Movement"))
+                    {
+                        playermovement.MoveCard();
+                    }
 
-            if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Lateral"))
-            {
-                playermovement.LateralAttack();
+                    if (cardSelected.transform.GetChild(0).gameObject.CompareTag("Lateral"))
+                    {
+                        playermovement.LateralAttack();
+                    }
+                }
             }
 
             cardSelected.transform.position = tempOriginalPosition;
-            child.transform.position = cardSelected.transform.position;
 
-            ActiveDeactiveLineRenderer(false, child);
+            if(child != null)
+            {
+                child.transform.position = cardSelected.transform.position;
+                ActiveDeactiveLineRenderer(false, child);
+            }
 
             positionStablished = false;
 
@@ -131,8 +142,12 @@ public class CardMovement : MonoBehaviour
 
     void ChangeMaterialAlpha(float alphaColor)
     {
-        Color previousColor = child.GetComponent<MeshRenderer>().material.color;
+        if(child!= null)
+        {
+            Color previousColor = child.GetComponent<MeshRenderer>().material.color;
 
-        child.GetComponent<MeshRenderer>().material.color = new Color(previousColor.r, previousColor.g, previousColor.b, alphaColor);
+            child.GetComponent<MeshRenderer>().material.color = new Color(previousColor.r, previousColor.g, previousColor.b, alphaColor);
+        }
+        
     }
 }

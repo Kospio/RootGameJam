@@ -23,11 +23,14 @@ public class PlayerMovement : MonoBehaviour
 
     public List<GameObject> interactableTiles;
 
-    public GameObject playerMesh; 
+    public GameObject playerMesh;
+
+    public LevelManager levelManager;
 
     // Start is called before the first frame update
     void Start()
     {
+        levelManager = levelManager.GetComponent<LevelManager>();
         cardMovement = cardMovement.GetComponent<CardMovement>();
 
         playerTilePosition = groundTilemap.WorldToCell(transform.position);
@@ -84,9 +87,13 @@ public class PlayerMovement : MonoBehaviour
             if (groundTilemap.WorldToCell(interactableTiles[i].transform.position) == groundTilemap.WorldToCell(cardMovement.groundhittingPoint))
             {
                 playerTileDestination = groundTilemap.WorldToCell(interactableTiles[i].transform.position);
-                StartCoroutine(SetPlayerPosition(0.4f));
             }
         }
+
+        Destroy(cardMovement.cardSelected.transform.GetChild(0).gameObject);
+
+        StartCoroutine(SetPlayerPosition(0.5f));
+
     }
 
     public void MoveCard()
@@ -96,14 +103,38 @@ public class PlayerMovement : MonoBehaviour
             if (groundTilemap.WorldToCell(interactableTiles[i].transform.position) == groundTilemap.WorldToCell(cardMovement.groundhittingPoint))
             {
                 playerTileDestination = groundTilemap.WorldToCell(interactableTiles[i].transform.position);
-                StartCoroutine(SetPlayerPosition(0.2f));
+
+                Destroy(cardMovement.cardSelected.transform.GetChild(0).gameObject);
+
+                StartCoroutine(SetPlayerPosition(0.3f));
             }
         }
     }
 
     public void LateralAttack()
     {
+        StartCoroutine(SpawnBox(0.2f)); 
 
+        Destroy(cardMovement.cardSelected.transform.GetChild(0).gameObject);
+
+        StartCoroutine(SetPlayerPosition(0f));
+    }
+
+    IEnumerator SpawnBox (float time)
+    {
+        gameObject.GetComponent<BoxCollider>().enabled = true;
+
+        yield return new WaitForSeconds(time);
+
+        gameObject.GetComponent<BoxCollider>().enabled = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemie"))
+        {
+            levelManager.KillEnemy(other.gameObject);
+        }
     }
 
     public void CheckIfTiles(int size)
@@ -181,7 +212,4 @@ public class PlayerMovement : MonoBehaviour
             go.GetComponent<MeshRenderer>().material = tileActuationMaterial;
         }
     }
-
-
-
 }
