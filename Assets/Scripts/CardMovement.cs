@@ -84,7 +84,10 @@ public class CardMovement : MonoBehaviour
         //Se tiene que hacer mientras se mantenga pulsado para poder moverse bien
         if (Physics.Raycast(ray, out RaycastHit terrainHit, float.MaxValue, terrainMask) && Input.GetMouseButton(0))
         {
-            cardSelected.transform.position = terrainHit.point;
+            if (cardSelected != null)
+            {
+                cardSelected.transform.position = terrainHit.point;
+            }
 
             groundhittingPoint = terrainHit.point;
         }
@@ -113,9 +116,12 @@ public class CardMovement : MonoBehaviour
                 }
             }
 
-            cardSelected.transform.position = tempOriginalPosition;
+            if (cardSelected != null)
+            {
+                cardSelected.transform.position = tempOriginalPosition;
+            }
 
-            if(child != null)
+            if (child != null)
             {
                 child.transform.position = cardSelected.transform.position;
                 ActiveDeactiveLineRenderer(false, child);

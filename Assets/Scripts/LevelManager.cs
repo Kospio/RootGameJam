@@ -64,6 +64,13 @@ public class LevelManager : MonoBehaviour
     }
     public void NextTurn()
     {
+        GameObject[] enemiesGO = GameObject.FindGameObjectsWithTag("Enemie");
+
+        for (int i = 0; i < enemiesGO.Length; i++)
+        {
+            enemiesGO[i].GetComponent<EnemyMovement>().preEnemyMovement();
+        }
+
         CheckForCards(); 
         SpawnRandomCards();
         UpdateGUI();
@@ -74,8 +81,6 @@ public class LevelManager : MonoBehaviour
     {
         for (int i = 0; i < cardPositionArray.Length; i++)
         {
-            Debug.Log(cardPositionArray[i].transform.childCount);
-
             if (cardPositionArray[i].transform.childCount != 0)
             {
                 Destroy(cardPositionArray[i].transform.GetChild(0).gameObject);
