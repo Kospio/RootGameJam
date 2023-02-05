@@ -210,6 +210,6 @@ public class LevelManager : MonoBehaviour
 
     public void Winning()
     {
-        Debug.Log("Victoria");
+        SceneManager.LoadScene("Victoria");
     }
 }
