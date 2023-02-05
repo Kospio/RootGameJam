@@ -205,11 +205,11 @@ public class LevelManager : MonoBehaviour
 
     public void GameOver()
     {
-        SceneManager.LoadScene(""); 
+        SceneManager.LoadScene("Muerte"); 
     }
 
     public void Winning()
     {
-        Debug.Log("Win");
+        Debug.Log("Victoria");
     }
 }
